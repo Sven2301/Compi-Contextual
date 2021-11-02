@@ -102,7 +102,7 @@ import Triangle.SyntacticAnalyzer.SourcePosition;
 public final class Checker implements Visitor {
 
   // Commands
-
+    public Boolean recursion = false; //AGREGADO @STEVEN
   // Always returns null. Does not use the given object.
 
   public Object visitAssignCommand(AssignCommand ast, Object o) {
@@ -1022,14 +1022,23 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitRecursiveProcFuncsDeclaration(RecursiveProcFuncsDeclaration ast, Object o) {
-    // TODO Auto-generated method stub
+    this.recursion = true;
+    ast.PFD.visit(this,null);
     return null;
   }
 
 
   @Override
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
-    // TODO Auto-generated method stub
+        idTable.openScope();
+    idTable.pushPrivFlag(false);
+    ast.D1.visit(this, null);
+    idTable.popPrivFlag();
+    idTable.pushPrivFlag(true);
+    ast.D2.visit(this, null);
+    idTable.popPrivFlag();
+    idTable.closePrivateScope();
+    idTable.privateExport();
     return null;
   }
 
