@@ -994,7 +994,15 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitRepeatForRange(RepeatForRange ast, Object o) {
-    // TODO Auto-generated method stub
+    TypeDenoter e1Type = (TypeDenoter) ast.E.visit(this, null);
+    if (!e1Type.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E.position);
+    TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
+    if (!e2Type.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
+    ast.RVD.visit(this, null);
+    ast.C.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
@@ -1052,7 +1060,10 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitInVarDecl(InVarDecl ast, Object o) {
-    // TODO Auto-generated method stub
+    ast.T = (TypeDenoter) ast.E.visit(this, null);
+    idTable.enter(ast.I.spelling, ast);
+    if (ast.duplicated)
+      reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     return null;
   }
 }
