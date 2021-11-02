@@ -1030,7 +1030,7 @@ public final class Checker implements Visitor {
 
   @Override
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
-        idTable.openScope();
+    idTable.openScope();
     idTable.pushPrivFlag(false);
     ast.D1.visit(this, null);
     idTable.popPrivFlag();
