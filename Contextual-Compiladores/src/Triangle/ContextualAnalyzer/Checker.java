@@ -1008,22 +1008,46 @@ public final class Checker implements Visitor {
 
 
   @Override
+  //IMPLEMENTADO @MARCO
   public Object visitRepeatForRangeWhile(RepeatForRangeWhile ast, Object o) {
-    // TODO Auto-generated method stub
+    TypeDenoter eType = (TypeDenoter) ast.E1.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E1.position);
+    TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
+    if (!e2Type.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
+    TypeDenoter e3Type = (TypeDenoter) ast.E2.visit(this, null);
+    if (!e3Type.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E2.position);
+    ast.RVD.visit(this, null);
+    ast.C.visit(this,null);
+    idTable.closeScope();
     return null;
   }
 
 
   @Override
+  //IMPLEMENTADO @MARCO
   public Object visitRepeatForRangeUntil(RepeatForRangeUntil ast, Object o) {
-    // TODO Auto-generated method stub
+    TypeDenoter eType = (TypeDenoter) ast.E1.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E1.position);
+    TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E1.position);
+    TypeDenoter e3Type = (TypeDenoter) ast.E2.visit(this, null);
+    if (!e3Type.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E2.position);
+    ast.C.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
-
   @Override
+  //IMPLEMENTADO @MARCO
   public Object visitRepeatIn(RepeatIn ast, Object o) {
-    // TODO Auto-generated method stub
+    TypeDenoter eType = (TypeDenoter) ast.IVD.E.visit(this, null);
+    
     return null;
   }
 
