@@ -903,7 +903,7 @@ public final class Checker implements Visitor {
 
   private void establishStdEnvironment () {
 
-    // idTable.startIdentification();
+    //idTable.startIdentification();
     StdEnvironment.booleanType = new BoolTypeDenoter(dummyPos);
     StdEnvironment.integerType = new IntTypeDenoter(dummyPos);
     StdEnvironment.charType = new CharTypeDenoter(dummyPos);
@@ -1011,18 +1011,23 @@ public final class Checker implements Visitor {
   @Override
   //IMPLEMENTADO @MARCO
   public Object visitRepeatForRangeWhile(RepeatForRangeWhile ast, Object o) {
+      
     TypeDenoter eType = (TypeDenoter) ast.E1.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E1.position);
     TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
     if (!e2Type.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
+    
+    ast.RVD.visit(this, null);
+    
     TypeDenoter e3Type = (TypeDenoter) ast.E2.visit(this, null);
     if (!e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E2.position);
-    ast.RVD.visit(this, null);
+    
     ast.C.visit(this,null);
     idTable.closeScope();
+    
     return null;
   }
 
@@ -1030,6 +1035,7 @@ public final class Checker implements Visitor {
   @Override
   //IMPLEMENTADO @MARCO
   public Object visitRepeatForRangeUntil(RepeatForRangeUntil ast, Object o) {
+      
     TypeDenoter eType = (TypeDenoter) ast.E1.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E1.position);
@@ -1041,6 +1047,7 @@ public final class Checker implements Visitor {
       reporter.reportError("Boolean expression expected here", "", ast.E2.position);
     ast.C.visit(this, null);
     idTable.closeScope();
+    
     return null;
   }
 
