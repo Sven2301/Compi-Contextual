@@ -1035,7 +1035,7 @@ public final class Checker implements Visitor {
       reporter.reportError("Integer expression expected here", "", ast.E1.position);
     TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.E1.position);
+      reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
     TypeDenoter e3Type = (TypeDenoter) ast.E2.visit(this, null);
     if (!e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E2.position);
@@ -1048,7 +1048,17 @@ public final class Checker implements Visitor {
   //IMPLEMENTADO @MARCO
   public Object visitRepeatIn(RepeatIn ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.IVD.E.visit(this, null);
-    
+    if (! eType.equals(StdEnvironment.errorType)) {
+        if (!(eType instanceof ArrayTypeDenoter))
+            reporter.reportError("Array expected here","", ast.IVD.E.position);
+        else{
+            if (!(eType.equals(StdEnvironment.integerType)))
+                reporter.reportError("Integer expected here","", ast.IVD.E.position);
+        }
+    }
+    ast.IVD.visit(this, null);
+    ast.C.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
