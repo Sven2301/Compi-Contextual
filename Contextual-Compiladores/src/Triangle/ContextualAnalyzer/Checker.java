@@ -993,6 +993,7 @@ public final class Checker implements Visitor {
 
 
   @Override
+  //IMPLEMENTADO @MARCO
   public Object visitRepeatForRange(RepeatForRange ast, Object o) {
     TypeDenoter e1Type = (TypeDenoter) ast.E.visit(this, null);
     if (!e1Type.equals(StdEnvironment.integerType))
@@ -1034,7 +1035,7 @@ public final class Checker implements Visitor {
       reporter.reportError("Integer expression expected here", "", ast.E1.position);
     TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.E1.position);
+      reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
     TypeDenoter e3Type = (TypeDenoter) ast.E2.visit(this, null);
     if (!e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E2.position);
@@ -1047,12 +1048,23 @@ public final class Checker implements Visitor {
   //IMPLEMENTADO @MARCO
   public Object visitRepeatIn(RepeatIn ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.IVD.E.visit(this, null);
-    
+    if (! eType.equals(StdEnvironment.errorType)) {
+        if (!(eType instanceof ArrayTypeDenoter))
+            reporter.reportError("Array expected here","", ast.IVD.E.position);
+        else{
+            if (!(eType.equals(StdEnvironment.integerType)))
+                reporter.reportError("Integer expected here","", ast.IVD.E.position);
+        }
+    }
+    ast.IVD.visit(this, null);
+    ast.C.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
 
   @Override
+  // IMPLEMENTADO @STEVEN
   public Object visitRecursiveProcFuncsDeclaration(RecursiveProcFuncsDeclaration ast, Object o) {
     this.recursion = true;
     ast.PFD.visit(this,null);
@@ -1061,6 +1073,7 @@ public final class Checker implements Visitor {
 
 
   @Override
+  //IMPLEMENTADO @STEVEN
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
     idTable.openScope();
     idTable.pushPrivFlag(false);
@@ -1076,13 +1089,20 @@ public final class Checker implements Visitor {
 
 
   @Override
+  //IMPLEMENTADO @STEVEN
   public Object visitRangeVarDecl(RangeVarDecl ast, Object o) {
-    // TODO Auto-generated method stub
+    ConstDeclaration controlVarDecl = new ConstDeclaration(ast.I,
+        new IntegerExpression(new IntegerLiteral("0", ast.position), ast.position), ast.position);
+    idTable.openScope();
+    controlVarDecl.visit(this, null);
+    if (controlVarDecl.duplicated)
+      reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     return null;
   }
 
 
   @Override
+  //IMPLENTADO @STEVEN
   public Object visitInVarDecl(InVarDecl ast, Object o) {
     ast.T = (TypeDenoter) ast.E.visit(this, null);
     idTable.enter(ast.I.spelling, ast);
