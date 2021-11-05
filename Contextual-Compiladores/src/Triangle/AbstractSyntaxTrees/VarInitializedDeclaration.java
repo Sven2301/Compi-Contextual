@@ -31,5 +31,6 @@ public class VarInitializedDeclaration extends Declaration {
 
   public Identifier I;
   public Expression E;
+  public TypeDenoter T; //Implementado @Marco
   
 }

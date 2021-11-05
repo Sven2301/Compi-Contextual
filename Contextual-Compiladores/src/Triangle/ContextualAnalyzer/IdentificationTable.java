@@ -1,4 +1,4 @@
- /*
+/*
  * @(#)IdentificationTable.java                2.1 2003/10/07
  *
  * Copyright (C) 1999, 2003 D.A. Watt and D.F. Brown
@@ -17,22 +17,19 @@ package Triangle.ContextualAnalyzer;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import java.util.Stack;
 
+// Cambio @Marco
 public final class IdentificationTable {
 
   private int level;
   private IdEntry latest;
-  
-  
-  private int levelBackup; // AGREGADO @STEVEN
-  private String packageID; //AGREGADO @STEVEN
-  private Stack<Boolean> privStack; //AGREGADO @STEVEN
+  private int levelBackup; // Agregado
+  private Stack<Boolean> privStack;  //Agregado
 
   public IdentificationTable () {
     level = 0;
-    levelBackup = level; //AGREGADO @STEVEN
-    packageID = null; //AGREGADO @STEVEN
     latest = null;
-    privStack = new Stack<>(); //AGREGADO @STEVEN
+    levelBackup = level;
+    privStack = new Stack<>();
   }
 
   // Opens a new level in the identification table, 1 higher than the
@@ -65,7 +62,6 @@ public final class IdentificationTable {
   // duplicated is set to to true iff there is already an entry for the
   // same identifier at the current level.
 
-  /*
   public void enter (String id, Declaration attr) {
 
     IdEntry entry = this.latest;
@@ -85,35 +81,6 @@ public final class IdentificationTable {
     attr.duplicated = present;
     // Add new entry ...
     entry = new IdEntry(id, attr, this.level, this.latest);
-    this.latest = entry;
-  }
-*/
-    //AGREGADO @STEVEN
-    // NUEVAS FUNCIONALIDADES PARA EL ENTER
-    public void enter (String id, Declaration attr) {
-    String[] realID = getRealID(id);
-    IdEntry entry = this.latest;
-    boolean present = false, searching = true;
-
-    // Check for duplicate entry ...
-    while (searching) {
-      if (entry == null || entry.level < this.level)
-        searching = false;
-      else if (this.isEntryEquals(entry.id, realID)) {
-        present = true;
-        searching = false;
-       } else
-       entry = entry.previous;
-    }
-
-    attr.duplicated = present;
-    // Add new entry ...
-    if (!this.privStack.isEmpty() && this.privStack.get(this.privStack.size() - 1)){
-        realID[0] = "Scope " + this.level;
-        entry = new IdEntry(realID, attr, this.level, this.latest, true);
-    } else {
-        entry = new IdEntry(realID, attr, this.level, this.latest, false);
-    }
     this.latest = entry;
   }
 
@@ -144,76 +111,4 @@ public final class IdentificationTable {
     return attr;
   }
 
-    // AGREGADO @STEVEN
-    private boolean isEntryEquals( String[] entryID, String[] id) {
-        return entryID[0].equals(id[0]) && entryID[1].equals(id[1]);
-    }
-    
-    // AGREGADO @STEVEN
-    private String[] getRealID(String id) {
-        if(this.level == 0 && this.packageID == null)
-            return new String[]{"Ambient",id};
-        else if (this.level == 0 && this.packageID != null)
-            return new String[]{this.packageID,id};
-        else
-            return new String[]{"Scope "+this.level,id};
-    }
-    
-    // AGREGADO @STEVEN
-    public void closePrivateScope () {
-    IdEntry entryExport, lastExport;
-    lastExport = this.latest;
-    entryExport = this.latest;
-    while (entryExport.privExport) {
-        lastExport = entryExport;
-        entryExport = lastExport.previous;
-    }
-    IdEntry entry, local;
-    entry = this.latest;
-    while (entry.level == this.level) {
-        local = entry;
-        entry = local.previous;
-    }
-    this.level--;
-    lastExport.previous = entry;
-   }
-    
-    // AGREGADO @STEVEN
-    void pushPrivFlag (boolean flag) {
-        this.privStack.push(flag);
-    }
-    
-    //AGREGADO @STEVEN
-    boolean popPrivFlag () {
-        return this.privStack.pop();
-    }
-    
-    //AGREGADO @STEVEN
-    void privateExport () {
-        IdEntry entry;
-        boolean searching;
-        searching = true;
-        entry = this.latest;
-        while (searching) {
-            if (entry == null)
-                searching = false;
-            else if(entry.privExport){
-                if(!this.privStack.contains(true)) { 
-                    entry.level -= 1;
-                    entry.id[0] = "Scope " + entry.level;
-                    entry.privExport = false;
-                }    
-                else{
-                    entry.level -= 1;
-                    entry.id[0] = "Scope " + entry.level;
-                }
-                entry = entry.previous;
-            } else
-              entry = entry.previous;
-        }
-    }
-    
-    //AGREGADO @MARCO
-    
-    
 }

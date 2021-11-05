@@ -256,7 +256,9 @@ public final class Checker implements Visitor {
   public Object visitLetExpression(LetExpression ast, Object o) {
     idTable.openScope();
     ast.D.visit(this, null);
+    
     ast.type = (TypeDenoter) ast.E.visit(this, null);
+    
     idTable.closeScope();
     return ast.type;
   }
@@ -708,6 +710,9 @@ public final class Checker implements Visitor {
   }
 
   public Object visitSimpleVname(SimpleVname ast, Object o) {
+      
+    
+    
     ast.variable = false;
     ast.type = StdEnvironment.errorType;
     Declaration binding = (Declaration) ast.I.visit(this, null);
@@ -726,7 +731,11 @@ public final class Checker implements Visitor {
       } else if (binding instanceof VarFormalParameter) {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
-      } else
+        // Agregado @Marco
+      } else if (binding instanceof VarInitializedDeclaration) {
+          ast.type = ((VarInitializedDeclaration) binding).T;
+          ast.variable = true;
+      }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
     return ast.type;
@@ -952,9 +961,13 @@ public final class Checker implements Visitor {
   }
 
  /* Métodos visitantes para las nuevas estructuras sintácticas, se implementarán en el proyecto 2 (Austin) */
+  // IMPLEMENTADO @MARCO
   @Override
   public Object visitVarInitializedDeclaration(VarInitializedDeclaration ast, Object o) {
-    // TODO Auto-generated method stub
+    ast.T = (TypeDenoter) ast.E.visit(this, null);
+    idTable.enter(ast.I.spelling, ast);
+    if (ast.duplicated)
+      reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     return null;
   }
 
@@ -995,14 +1008,13 @@ public final class Checker implements Visitor {
   @Override
   //IMPLEMENTADO @MARCO
   public Object visitRepeatForRange(RepeatForRange ast, Object o) {
-    TypeDenoter e1Type = (TypeDenoter) ast.E.visit(this, null);
-    if (!e1Type.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.E.position);
-    TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
-    if (!e2Type.equals(StdEnvironment.integerType))
-      reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
-    ast.RVD.visit(this, null);
-    ast.C.visit(this, null);
+    
+    ConstDeclaration controlVarDecl = new ConstDeclaration(ast.RVD.I,new IntegerExpression(new IntegerLiteral("0", ast.RVD.position), ast.RVD.position), ast.RVD.position);
+    idTable.openScope();
+    controlVarDecl.visit(this,null);
+    if (controlVarDecl.duplicated)
+      reporter.reportError("identifier \"%\" already declared", ast.RVD.I.spelling, ast.position);
+    
     idTable.closeScope();
     return null;
   }
@@ -1013,11 +1025,14 @@ public final class Checker implements Visitor {
   public Object visitRepeatForRangeWhile(RepeatForRangeWhile ast, Object o) {
       
     TypeDenoter eType = (TypeDenoter) ast.E1.visit(this, null);
-    if (! eType.equals(StdEnvironment.integerType))
+    if (!eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.E1.position);
+    
+    
     TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
     if (!e2Type.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
+    
     
     ast.RVD.visit(this, null);
     
@@ -1025,9 +1040,9 @@ public final class Checker implements Visitor {
     if (!e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E2.position);
     
-    ast.C.visit(this,null);
-    idTable.closeScope();
     
+    ast.C.visit(this, null);
+    idTable.closeScope();
     return null;
   }
 
@@ -1042,6 +1057,7 @@ public final class Checker implements Visitor {
     TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
     if (! eType.equals(StdEnvironment.integerType))
       reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
+    ast.RVD.visit(this, null);
     TypeDenoter e3Type = (TypeDenoter) ast.E2.visit(this, null);
     if (!e3Type.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E2.position);
@@ -1083,14 +1099,8 @@ public final class Checker implements Visitor {
   //IMPLEMENTADO @STEVEN
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
     idTable.openScope();
-    idTable.pushPrivFlag(false);
     ast.D1.visit(this, null);
-    idTable.popPrivFlag();
-    idTable.pushPrivFlag(true);
     ast.D2.visit(this, null);
-    idTable.popPrivFlag();
-    idTable.closePrivateScope();
-    idTable.privateExport();
     return null;
   }
 

@@ -1,0 +1,20 @@
+<p style="font-family: 'DejaVu Sans', monospace;"><font color='#00b300'>! local se elabora de manera que las declaraciones secuenciales se trabajan apropiadamente<br>
+</font><b>let</b><br>
+<br>
+  <b>local</b><br>
+      <b>var</b> a   <b>:=</b> <font color='#0000cd'>1</font><b>;</b><br>
+      <b>const</b> b <b>~</b> <font color='#0000cd'>1</font> <br>
+<br>
+  <b>in</b><br>
+      <b>proc</b> P<b>(</b><b>)</b> <b>~</b> putint<b>(</b>a<b>)</b> <b>end</b><b>;</b><font color='#00b300'> ! a visible aquí<br>
+      </font><b>func</b> m<b>(</b><b>)</b><b>:</b> Integer <b>~</b> b <b>+</b> <font color='#0000cd'>2</font><font color='#00b300'> ! b visible aquí<br>
+<br>
+  </font><b>end</b><br>
+<br>
+<b>in</b><br>
+<br>
+  P<b>(</b><b>)</b> <b>;</b><font color='#00b300'> ! P visible aquí<br>
+  </font>puteol <b>(</b><b>)</b> <b>;</b><br>
+  putint <b>(</b>m<b>(</b><b>)</b><b>)</b><font color='#00b300'> ! m visible aquí<br>
+<br>
+</font><b>end</b></p>
