@@ -8,6 +8,13 @@ public class InVarDecl extends Declaration {
         I = iAST;
         E = eAST;
     }
+    //@AGREGADO MARCO
+    public InVarDecl (Identifier iAST, Expression eAST, SourcePosition thePosition, TypeDenoter tAST) {
+        super(thePosition);
+        I = iAST;
+        E = eAST;
+        T = tAST;
+    }
 
     public Object visit(Visitor v, Object o) {
         return v.visitInVarDecl(this, o);

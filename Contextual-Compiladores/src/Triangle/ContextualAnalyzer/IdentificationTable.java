@@ -22,14 +22,12 @@ public final class IdentificationTable {
 
   private int level;
   private IdEntry latest;
-  private int levelBackup; // Agregado
-  private Stack<Boolean> privStack;  //Agregado
+  protected boolean localScope = false; // Agregado
 
   public IdentificationTable () {
     level = 0;
     latest = null;
-    levelBackup = level;
-    privStack = new Stack<>();
+    
   }
 
   // Opens a new level in the identification table, 1 higher than the
@@ -79,8 +77,12 @@ public final class IdentificationTable {
     }
 
     attr.duplicated = present;
-    // Add new entry ...
-    entry = new IdEntry(id, attr, this.level, this.latest);
+    if (localScope){
+        entry = new IdEntry(id, attr, this.level, this.latest, true);
+    }else {
+        entry = new IdEntry(id, attr, this.level, this.latest, false);
+    }
+    
     this.latest = entry;
   }
 
@@ -110,5 +112,28 @@ public final class IdentificationTable {
 
     return attr;
   }
-
+  
+  //@Agregado @Marco
+  public void closeLocalScope(){
+      this.localScope = false;
+  }
+  public void openLocalScope(){
+      this.localScope = true;
+  }
+  
+  public void clearLocalScope() {
+      IdEntry entry, local, localDcl;
+      
+      entry = this.latest;
+      localDcl = this.latest.previous;
+      
+      while (localDcl.localLevel != true) {
+          local = entry;
+          entry = local.previous;
+          localDcl = local.previous;
+      }
+      entry.previous  = localDcl.previous;
+      this.latest = entry;
+  }
+  
 }

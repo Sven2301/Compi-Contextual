@@ -735,6 +735,12 @@ public final class Checker implements Visitor {
       } else if (binding instanceof VarInitializedDeclaration) {
           ast.type = ((VarInitializedDeclaration) binding).T;
           ast.variable = true;
+          
+        // Agregado @Marco
+      } else if (binding instanceof InVarDecl) {
+          ast.type = ((InVarDecl) binding).T;
+          ast.variable = true;
+          
       }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
@@ -742,6 +748,7 @@ public final class Checker implements Visitor {
   }
 
   public Object visitSubscriptVname(SubscriptVname ast, Object o) {
+    
     TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
     ast.variable = ast.V.variable;
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
@@ -1011,6 +1018,7 @@ public final class Checker implements Visitor {
     
     ConstDeclaration controlVarDecl = new ConstDeclaration(ast.RVD.I,new IntegerExpression(new IntegerLiteral("0", ast.RVD.position), ast.RVD.position), ast.RVD.position);
     idTable.openScope();
+    
     controlVarDecl.visit(this,null);
     if (controlVarDecl.duplicated)
       reporter.reportError("identifier \"%\" already declared", ast.RVD.I.spelling, ast.position);
@@ -1070,20 +1078,13 @@ public final class Checker implements Visitor {
   }
 
   @Override
+  
   //IMPLEMENTADO @MARCO
   public Object visitRepeatIn(RepeatIn ast, Object o) {
-    TypeDenoter eType = (TypeDenoter) ast.IVD.E.visit(this, null);
-    if (! eType.equals(StdEnvironment.errorType)) {
-        if (!(eType instanceof ArrayTypeDenoter))
-            reporter.reportError("Array expected here","", ast.IVD.E.position);
-        else{
-            if (!(eType.equals(StdEnvironment.integerType)))
-                reporter.reportError("Integer expected here","", ast.IVD.E.position);
-        }
-    }
-    ast.IVD.visit(this, null);
-    ast.C.visit(this, null);
-    idTable.closeScope();
+    
+    
+    
+    
     return null;
   }
 
@@ -1098,12 +1099,31 @@ public final class Checker implements Visitor {
 
 
   @Override
-  //IMPLEMENTADO @STEVEN
+  //IMPLEMENTADO @MARCO
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
-    idTable.openScope();
-    ast.D1.visit(this, null);
-    ast.D2.visit(this, null);
+      
+    
+    idTable.openLocalScope();
+    if (ast.D1 instanceof LocalDeclaration){
+        visitLocalDeclarationAUX((LocalDeclaration)ast.D1,o);
+    }else {
+        ast.D1.visit(this,o);
+    }
+    idTable.closeLocalScope();
+    ast.D2.visit(this,o);
+    idTable.clearLocalScope();
+    if (ast.D1 instanceof LocalDeclaration){
+        idTable.clearLocalScope();
+    }
     return null;
+
+    }
+  
+  
+  public Object visitLocalDeclarationAUX(LocalDeclaration ast, Object o){
+      ast.D1.visit(this, o);
+      ast.D2.visit(this, o);
+      return null;
   }
 
 
@@ -1121,7 +1141,7 @@ public final class Checker implements Visitor {
 
 
   @Override
-  //IMPLENTADO @STEVEN
+  //IMPLENTADO @MARCO Y STEVEN
   public Object visitInVarDecl(InVarDecl ast, Object o) {
     ast.T = (TypeDenoter) ast.E.visit(this, null);
     idTable.enter(ast.I.spelling, ast);
