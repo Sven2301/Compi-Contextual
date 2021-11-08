@@ -1101,28 +1101,28 @@ public final class Checker implements Visitor {
   @Override
   //IMPLEMENTADO @MARCO
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
-      
     
     idTable.openLocalScope();
     if (ast.D1 instanceof LocalDeclaration){
-        visitLocalDeclarationAUX((LocalDeclaration)ast.D1,o);
+        visitLocalDeclarationAUX((LocalDeclaration)ast.D1,null);
     }else {
-        ast.D1.visit(this,o);
+        ast.D1.visit(this,null);
     }
     idTable.closeLocalScope();
-    ast.D2.visit(this,o);
+    ast.D2.visit(this,null);
     idTable.clearLocalScope();
     if (ast.D1 instanceof LocalDeclaration){
         idTable.clearLocalScope();
     }
+    
     return null;
 
     }
   
   
   public Object visitLocalDeclarationAUX(LocalDeclaration ast, Object o){
-      ast.D1.visit(this, o);
-      ast.D2.visit(this, o);
+      ast.D1.visit(this, null);
+      ast.D2.visit(this, null);
       return null;
   }
 
