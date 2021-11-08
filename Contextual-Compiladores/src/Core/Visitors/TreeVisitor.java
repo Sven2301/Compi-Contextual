@@ -31,6 +31,7 @@ import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.Function;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -50,8 +51,10 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.Procedure;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RangeVarDecl;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.RecursiveProcFuncsDeclaration;
@@ -61,6 +64,7 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
@@ -502,4 +506,37 @@ public class TreeVisitor implements Visitor {
         return(t);             
     }
     // </editor-fold>
+
+    @Override
+    //AGREGADO @STEVEN
+    public Object visitRecDeclaration(RecDeclaration ast, Object obj) {
+        return(createUnary("Recursive declaration", ast.PFs));
+    }
+
+    @Override
+    //AGREGADO @STEVEN
+    public Object visitSequentialProcFuncs (SequentialProcFuncs ast, Object obj) {
+        return(createBinary("ProcFuncs", ast.PF1, ast.PF2));
+    }
+
+    @Override
+    //AGREGADO @STEVEN
+    public Object visitProcedure (Procedure ast, Object obj) {
+        return(createTernary("Procedure", ast.I, ast.FPS, ast.C));
+    }
+    
+    //AGREGADO @STEVEN
+    public Object visitFunction (Function ast, Object obj) {
+        return(createQuaternary("Function", ast.I, ast.FPS, ast.TD, ast.E));
+    }
+
+    @Override
+    public Object visitFuncDeclaration2(FuncDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

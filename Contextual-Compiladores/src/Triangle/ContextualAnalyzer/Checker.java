@@ -46,6 +46,7 @@ import Triangle.AbstractSyntaxTrees.FormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.Function;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -65,8 +66,10 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.Procedure;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RangeVarDecl;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.RecursiveProcFuncsDeclaration;
@@ -76,6 +79,7 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
@@ -312,30 +316,27 @@ public final class Checker implements Visitor {
 
   public Object visitFuncDeclaration(FuncDeclaration ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
-    idTable.enter (ast.I.spelling, ast); // permits recursion
+    idTable.enter(ast.I.spelling, ast); // permits recursion
     if (ast.duplicated)
-      reporter.reportError ("identifier \"%\" already declared",
-                            ast.I.spelling, ast.position);
+      reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     idTable.openScope();
     ast.FPS.visit(this, null);
-    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    //TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     idTable.closeScope();
-    if (! ast.T.equals(eType))
-      reporter.reportError ("body of function \"%\" has wrong type",
-                            ast.I.spelling, ast.E.position);
-    return null;
+
+
+    return ast;
   }
 
   public Object visitProcDeclaration(ProcDeclaration ast, Object o) {
-    idTable.enter (ast.I.spelling, ast); // permits recursion
+    idTable.enter(ast.I.spelling, ast); // permits recursion
     if (ast.duplicated)
-      reporter.reportError ("identifier \"%\" already declared",
-                            ast.I.spelling, ast.position);
+      reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     idTable.openScope();
     ast.FPS.visit(this, null);
-    ast.C.visit(this, null);
+    //ast.C.visit(this, null);
     idTable.closeScope();
-    return null;
+    return ast;
   }
 
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object o) {
@@ -1096,6 +1097,13 @@ public final class Checker implements Visitor {
     ast.PFD.visit(this,null);
     return null;
   }
+  
+  
+    public Object visitRecDeclaration(RecDeclaration ast, Object o) {
+    this.recursion = true;
+    ast.PFs.visit(this,null);
+    return null;
+  }
 
 
   @Override
@@ -1149,4 +1157,64 @@ public final class Checker implements Visitor {
       reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     return null;
   }
+
+    @Override
+  public Object visitSequentialProcFuncs(SequentialProcFuncs ast, Object o) {
+      
+    
+      
+    //idTable.openScope();
+    Object currentAst2 = ast.PF2.visit(this,null);
+    Object currentAst = ast.PF1.visit(this,null);
+    
+    if(currentAst2 instanceof FuncDeclaration){
+        this.visitFuncDeclaration2((FuncDeclaration) currentAst2,null);
+    }
+    else if(currentAst2 instanceof ProcDeclaration){
+        this.visitProcDeclaration2((ProcDeclaration) currentAst2,null);
+   }
+
+    if(currentAst instanceof FuncDeclaration){
+        this.visitFuncDeclaration2((FuncDeclaration) currentAst,null);
+    }
+    else if(currentAst instanceof ProcDeclaration){
+        this.visitProcDeclaration2((ProcDeclaration) currentAst,null);
+    }
+    
+    return null;
+  }
+
+  //AGREGADO @STEVEN
+  public Object visitProcedure(Procedure ast, Object o) {
+    ProcDeclaration procedureDeclaration = new ProcDeclaration(ast.I,ast.FPS,ast.C,ast.position);
+    return procedureDeclaration.visit(this, null);
+  }
+
+  //AGREGADO @STEVEN
+  public Object visitFunction(Function ast, Object o) {
+    FuncDeclaration funcDeclaration = new FuncDeclaration(ast.I,ast.FPS,ast.TD,ast.E,ast.position); 
+    return funcDeclaration.visit(this, null);
+  }
+  
+    public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
+    idTable.openScope();
+    ast.FPS.visit(this, null);
+    ast.C.visit(this, null);
+    
+    idTable.closeScope();
+    return null;
+  }
+    
+  public Object visitFuncDeclaration2(FuncDeclaration ast, Object o) {
+    ast.T = (TypeDenoter) ast.T.visit(this, null);
+    
+    idTable.openScope();
+    ast.FPS.visit(this, null);
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    idTable.closeScope();
+    if (!this.recursion && !ast.T.equals(eType))
+      reporter.reportError("body of function \"%\" has wrong type", ast.I.spelling, ast.E.position);
+    return null;
+  }
+
 }

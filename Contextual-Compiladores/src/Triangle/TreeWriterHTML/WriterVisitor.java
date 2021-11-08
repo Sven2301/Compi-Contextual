@@ -26,6 +26,7 @@ import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.Function;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -45,8 +46,10 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.Procedure;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RangeVarDecl;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.RecursiveProcFuncsDeclaration;
@@ -56,6 +59,7 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
@@ -708,4 +712,51 @@ public class WriterVisitor implements Visitor {
     else
       return operator;
   }
+
+    @Override
+    public Object visitRecDeclaration(RecDeclaration ast, Object o) {
+        writeLineHTML("<RecDeclaration>");
+        ast.PFs.visit(this, null);
+        writeLineHTML("</RecDeclaration>");
+        return null;    
+        }
+
+    @Override
+    public Object visitSequentialProcFuncs(SequentialProcFuncs ast, Object o) {
+        writeLineHTML("<SeqProcFuncs>");
+        ast.PF1.visit(this, null);
+        ast.PF2.visit(this, null);
+        writeLineHTML("</SeqProcFuncs>");
+        return null;
+    }
+
+    @Override
+    public Object visitProcedure(Procedure ast, Object o) {
+        writeLineHTML("<Procedure>");
+        ast.C.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.I.visit(this, null);
+        writeLineHTML("</Procedure>");
+        return null;    
+    }
+
+    @Override
+    public Object visitFunction(Function ast, Object o) {
+        writeLineHTML("<Function>");
+        ast.E.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.TD.visit(this, null);
+        ast.I.visit(this, null);
+        writeLineHTML("</Function>");
+        return null;        }
+
+    @Override
+    public Object visitFuncDeclaration2(FuncDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

@@ -51,7 +51,9 @@ public interface Visitor {
   public abstract Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object o);
   public abstract Object visitConstDeclaration(ConstDeclaration ast, Object o);
   public abstract Object visitFuncDeclaration(FuncDeclaration ast, Object o);
+  public abstract Object visitFuncDeclaration2(FuncDeclaration ast, Object o);
   public abstract Object visitProcDeclaration(ProcDeclaration ast, Object o);
+  public abstract Object visitProcDeclaration2(ProcDeclaration ast, Object o);
   public abstract Object visitSequentialDeclaration(SequentialDeclaration ast, Object o);
   public abstract Object visitTypeDeclaration(TypeDeclaration ast, Object o);
   public abstract Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast, Object o);
@@ -117,6 +119,14 @@ public interface Visitor {
 
   // Programs
   public abstract Object visitProgram(Program ast, Object o);
+
+    public Object visitRecDeclaration(RecDeclaration aThis, Object o);
+
+    public Object visitSequentialProcFuncs(SequentialProcFuncs aThis, Object o);
+
+    public Object visitProcedure(Procedure aThis, Object o);
+
+    public Object visitFunction(Function aThis, Object o);
 
 
 }

@@ -16,6 +16,32 @@ package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
 
+
+public class ProcDeclaration extends SingleDeclaration {
+    
+  public ProcDeclaration (Identifier iAST, FormalParameterSequence fpsAST,
+  		   Command cAST, SourcePosition thePosition) {
+    super (thePosition);
+    I = iAST;
+    FPS = fpsAST;
+    C = cAST;
+  }
+
+  public Object visit (Visitor v, Object o) {
+    return v.visitProcDeclaration(this, o);
+  }
+
+  public Object visitXML(Visitor v, Object o) {
+    return v.visitProcDeclaration(this, o);
+  }
+
+  public Identifier I;
+  public FormalParameterSequence FPS;
+  public Command C;
+}
+
+
+/* ELIMINADO @STEVEN
 public class ProcDeclaration extends Declaration {
 
   public ProcDeclaration (Identifier iAST, FormalParameterSequence fpsAST,
@@ -34,3 +60,4 @@ public class ProcDeclaration extends Declaration {
   public FormalParameterSequence FPS;
   public Command C;
 }
+*/

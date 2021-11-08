@@ -31,6 +31,7 @@ import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.Function;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -50,8 +51,10 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.Procedure;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RangeVarDecl;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.RecursiveProcFuncsDeclaration;
@@ -61,6 +64,7 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
@@ -758,4 +762,46 @@ public class TableVisitor implements Visitor {
   // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     private DefaultTableModel model;
     // </editor-fold>
+
+    @Override
+    //AGREGADO @STEVEN
+    public Object visitRecDeclaration(RecDeclaration ast, Object o) {
+        ast.PFs.visit(this, null);
+        return (null);
+    }
+
+    @Override
+    //AGREGADO @STEVEN
+   public Object visitSequentialProcFuncs (SequentialProcFuncs ast, Object o) {
+        ast.PF1.visit(this, null);
+        ast.PF2.visit(this, null);
+        return (null);
+  }
+
+   //AGREGADO @STEVEN
+   public Object visitProcedure (Procedure ast, Object o) {
+        ast.I.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.C.visit(this, null);
+        return (null);
+  }
+   
+   //AGREGADO @STEVEN
+   public Object visitFunction (Function ast, Object o) {
+        ast.I.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.TD.visit(this, null);
+        ast.E.visit(this, null);
+        return (null);
+  }
+
+    @Override
+    public Object visitFuncDeclaration2(FuncDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
