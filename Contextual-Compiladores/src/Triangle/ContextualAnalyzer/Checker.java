@@ -1016,14 +1016,14 @@ public final class Checker implements Visitor {
   @Override
   //IMPLEMENTADO @MARCO
   public Object visitRepeatForRange(RepeatForRange ast, Object o) {
-    
-    ConstDeclaration controlVarDecl = new ConstDeclaration(ast.RVD.I,new IntegerExpression(new IntegerLiteral("0", ast.RVD.position), ast.RVD.position), ast.RVD.position);
-    idTable.openScope();
-    
-    controlVarDecl.visit(this,null);
-    if (controlVarDecl.duplicated)
-      reporter.reportError("identifier \"%\" already declared", ast.RVD.I.spelling, ast.position);
-    
+    TypeDenoter e1Type = (TypeDenoter) ast.E.visit(this, null);
+    if (!e1Type.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E.position);
+    TypeDenoter e2Type = (TypeDenoter) ast.RVD.E.visit(this, null);
+    if (!e2Type.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.RVD.E.position);
+    ast.RVD.visit(this, null);
+    ast.C.visit(this, null);
     idTable.closeScope();
     return null;
   }
