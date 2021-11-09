@@ -46,6 +46,7 @@ import Triangle.AbstractSyntaxTrees.FormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.Function;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -64,7 +65,11 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.ProcFunc;
+import Triangle.AbstractSyntaxTrees.ProcFuncs;
+import Triangle.AbstractSyntaxTrees.Procedure;
 import Triangle.AbstractSyntaxTrees.Program;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordAggregate;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
@@ -75,6 +80,7 @@ import Triangle.AbstractSyntaxTrees.RecursiveProcFuncsDeclaration;
 import Triangle.AbstractSyntaxTrees.RepeatForRange;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
@@ -762,10 +768,10 @@ public class Parser {
 
       case Token.RECURSIVE: {
         acceptIt();
-        Declaration dAST = parseProcFuncsDeclaration();
+        ProcFuncs pfsAST = parseProcFuncs();
         accept(Token.END);
         finish(declarationPos);
-        declarationAST = new RecursiveProcFuncsDeclaration(dAST, declarationPos);
+        declarationAST = new RecDeclaration(pfsAST, declarationPos);
       }
         break;
 
@@ -1204,4 +1210,75 @@ public class Parser {
     return fieldAST;
   }
 
+  
+  
+  /*-----------------------------*/
+//AGREGADO @STEVEN
+  ProcFuncs parseProcFuncs() throws SyntaxError {
+    ProcFuncs procfuncsAST = null; // in case there's a syntactic error
+
+    SourcePosition procfuncsPos = new SourcePosition();
+    start(procfuncsPos);
+    procfuncsAST = parseProcFunc();
+    accept(Token.PIPE);
+    ProcFuncs procfuncs2AST = parseProcFunc();
+    finish(procfuncsPos);
+    procfuncsAST = new SequentialProcFuncs(procfuncsAST, procfuncs2AST, procfuncsPos);
+    while (currentToken.kind == Token.PIPE) {
+      acceptIt();
+      procfuncs2AST = parseProcFunc();
+      finish(procfuncsPos);
+      procfuncsAST = new SequentialProcFuncs(procfuncsAST, procfuncs2AST, procfuncsPos);
+    }
+    return procfuncsAST;
+  }
+  
+  
+  ProcFunc parseProcFunc() throws SyntaxError {
+    ProcFunc procfuncAST = null; // in case there's a syntactic error
+    SourcePosition procfuncPos = new SourcePosition();
+    start (procfuncPos);
+    switch (currentToken.kind) {
+    case Token.PROC:
+      {
+        acceptIt();
+        Identifier iAST = parseIdentifier();
+        accept(Token.LPAREN);
+        FormalParameterSequence fpsAST = parseFormalParameterSequence();
+        accept(Token.RPAREN);
+        accept(Token.IS);
+        Command cAST = parseCommand();
+        accept(Token.END);
+        finish(procfuncPos);
+        procfuncAST = new Procedure(iAST, fpsAST, cAST, procfuncPos);
+      }
+      break;
+
+    case Token.FUNC:
+      {
+        acceptIt();
+        Identifier iAST = parseIdentifier();
+        accept(Token.LPAREN);
+        FormalParameterSequence fpsAST = parseFormalParameterSequence();
+        accept(Token.RPAREN);
+        accept(Token.COLON);
+        TypeDenoter tdAST = parseTypeDenoter();
+        accept(Token.IS);
+        Expression eAST = parseExpression();
+        finish(procfuncPos);
+        procfuncAST = new Function(iAST, fpsAST, tdAST, eAST, procfuncPos);
+      }
+      break;
+
+    default:
+      syntacticError("\"%\" cannot start a procedure or a function",
+        currentToken.spelling);
+      break;
+    }
+    return procfuncAST;
+  }
 }
+
+
+
+
