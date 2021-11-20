@@ -28,6 +28,7 @@ import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CompoundIfCommand;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
@@ -79,11 +80,13 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
+import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
@@ -1210,6 +1213,36 @@ public final class Checker implements Visitor {
     idTable.closeScope();
     if (!this.recursion && !ast.T.equals(eType))
       reporter.reportError("body of function \"%\" has wrong type", ast.I.spelling, ast.E.position);
+    return null;
+  }
+
+    @Override
+    // IMPLEMENTADO @Steven
+  public Object visitCompoundIfCommand(CompoundIfCommand ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (!eType.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    ast.C1.visit(this, null);
+    ast.EIC.visit(this, null);
+    ast.C2.visit(this, null);
+    return null;
+  }
+
+    @Override
+    // IMPLEMENTADO @Steven
+  public Object visitSequentialElsifCommand(SequentialElsifCommand ast, Object o) {
+    ast.SE1.visit(this, null);
+    ast.SE2.visit(this, null);
+    return null;
+  }
+
+    @Override
+    // IMPLEMENTADO @Steven
+  public Object visitSingleElsifCommand(SingleElsifCommand ast, Object o) {
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (!eType.equals(StdEnvironment.booleanType))
+      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    ast.C.visit(this, null);
     return null;
   }
 

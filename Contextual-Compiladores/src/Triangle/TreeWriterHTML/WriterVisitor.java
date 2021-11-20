@@ -12,6 +12,7 @@ import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CompoundIfCommand;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
@@ -59,11 +60,13 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
+import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
@@ -757,6 +760,21 @@ public class WriterVisitor implements Visitor {
 
     @Override
     public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitCompoundIfCommand(CompoundIfCommand aThis, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitSequentialElsifCommand(SequentialElsifCommand aThis, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitSingleElsifCommand(SingleElsifCommand aThis, Object o) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

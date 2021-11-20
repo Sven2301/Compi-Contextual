@@ -128,5 +128,11 @@ public interface Visitor {
 
     public Object visitFunction(Function aThis, Object o);
 
+    public Object visitCompoundIfCommand(CompoundIfCommand aThis, Object o);
+
+    public Object visitSequentialElsifCommand(SequentialElsifCommand aThis, Object o);
+
+    public Object visitSingleElsifCommand(SingleElsifCommand aThis, Object o);
+
 
 }

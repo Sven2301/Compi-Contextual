@@ -36,6 +36,7 @@ import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CompoundIfCommand;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
@@ -84,11 +85,13 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
+import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
@@ -105,6 +108,7 @@ import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
+import java.util.ArrayList;
 
 public final class Encoder implements Visitor {
 
@@ -1114,6 +1118,80 @@ public final class Encoder implements Visitor {
     public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    // IMPLEMENTADO @Steven
+  public Object visitCompoundIfCommand(CompoundIfCommand ast, Object o) {
+    Frame frame = (Frame) o;
+    int jumpifAddr, jumpAddr;
+    
+    // Evaluate if expression
+    Integer valSize = (Integer) ast.E.visit(this, frame);
+    jumpifAddr = nextInstrAddr;
+    // Jump to next elsif instruction
+    emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, 0);
+    // Execute if command
+    ast.C1.visit(this, frame);
+    // Addr to jump to halt
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    patch(jumpifAddr, nextInstrAddr);
+    // Point JUMP addr from if to the addr of the first elsif
+    Object elsifJumpAddrs = ast.EIC.visit(this, frame);
+    ast.C2.visit(this, frame);
+    // Point the jump address of the if to the next instruction
+    // after the if
+    patch(jumpAddr, nextInstrAddr);
+    // Check if single address or set of addresses
+    if (elsifJumpAddrs instanceof Integer) {
+        patch((Integer) elsifJumpAddrs, nextInstrAddr);
+    } else {
+        ArrayList<Integer> addrs = (ArrayList<Integer>) elsifJumpAddrs;
+        // Update the jumps of the elsifs
+        for (int addr : addrs) {
+            patch(addr, nextInstrAddr);
+        }
+    }
+  
+    return null;
+  }
+
+    @Override
+    // IMPLEMENTADO @Steven
+  public Object visitSequentialElsifCommand(SequentialElsifCommand ast, Object o) {
+      Frame frame = (Frame) o;
+      ArrayList<Integer> jumpAddrs = new ArrayList<Integer>();
+      Object addrs = ast.SE1.visit(this, frame);
+      // Append an ArrayList of Integer if it is sequential
+      if (ast.SE1 instanceof SingleElsifCommand) {
+          int incomingAddr = (Integer) addrs;
+          jumpAddrs.add(incomingAddr);
+      } else if (ast.SE1 instanceof SequentialElsifCommand) {
+          ArrayList<Integer> addressArr = (ArrayList<Integer>) addrs;
+          jumpAddrs.addAll(addressArr);
+      }
+      int elsif2JumpAddr = (Integer) ast.SE2.visit(this, frame);
+      jumpAddrs.add(elsif2JumpAddr);
+      
+      return jumpAddrs;
+  }
+
+    @Override
+    // IMPLEMENTADO @Steven
+  public Object visitSingleElsifCommand(SingleElsifCommand ast, Object o) {
+    Frame frame = (Frame) o;
+    int jumpifAddr, jumpAddr;
+    
+    Integer valSize = (Integer) ast.E.visit(this, frame);
+    jumpifAddr = nextInstrAddr;
+    emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, 0);
+    ast.C.visit(this, frame);
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    patch(jumpifAddr, nextInstrAddr);
+    
+    return jumpAddr;
+  }
 
 
 }

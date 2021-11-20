@@ -29,6 +29,7 @@ import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CompoundIfCommand;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
@@ -76,11 +77,13 @@ import Triangle.AbstractSyntaxTrees.RepeatForRangeWhile;
 import Triangle.AbstractSyntaxTrees.RepeatIn;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
+import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
+import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
@@ -576,20 +579,17 @@ public class LayoutVisitor implements Visitor {
   /* Métodos para reconocer las nuevas estructuras sintácticas, creo que no se implementan porque esta funcionalidad no está completa (Austin) */
   @Override
   public Object visitRepeatUntilCommand(UntilCommand ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutBinary("UntilCom.", ast.E, ast.C);
   }
 
   @Override
   public Object visitRepeatDoWhileCommand(DoWhileCommand ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutBinary("DoWhileCom.", ast.C, ast.E);
   }
 
   @Override
   public Object visitRepeatDoUntilCommand(DoUntilCommand ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutBinary("DoUntilCom.", ast.C, ast.E);
   }
 
   @Override
@@ -657,5 +657,22 @@ public class LayoutVisitor implements Visitor {
     public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    //IMPLEMENTADO @Steven
+    public Object visitCompoundIfCommand(CompoundIfCommand ast, Object o) {
+      return layoutQuaternary("Comp.If.Com", ast.E, ast.C1, ast.EIC, ast.C2);
+  }
+
+    @Override
+    public Object visitSequentialElsifCommand(SequentialElsifCommand ast, Object o) {
+      return layoutBinary("Seq.Or.Com", ast.SE1, ast.SE2);
+  }
+
+    @Override
+    //IMPLEMENTADO @Steven
+    public Object visitSingleElsifCommand(SingleElsifCommand ast, Object o) {
+      return layoutBinary("Sing.Or.Com", ast.E, ast.C);
+  }
 
 }
