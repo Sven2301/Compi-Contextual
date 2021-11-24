@@ -35,6 +35,7 @@ import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DoUntilCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.DotVarName;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -88,6 +89,7 @@ import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.SubscriptVarName;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
@@ -386,7 +388,7 @@ public class LayoutVisitor implements Visitor {
   }
 
   public Object visitSimpleVname(SimpleVname ast, Object obj) {
-    return layoutUnary("Sim.Vname", ast.I);
+      return layoutUnary("Simp.Vname", ast.VN);
   }
 
   public Object visitSubscriptVname(SubscriptVname ast, Object obj) {
@@ -682,9 +684,19 @@ public class LayoutVisitor implements Visitor {
     return layoutUnary("Sim.Var.Name", ast.I);
     }
 
-    @Override
     public Object visitVarTDDeclaration(VarTDDeclaration ast, Object o) {
             return layoutBinary("VarDecl.", ast.I, ast.T);
+    }
+
+    @Override
+    public Object visitDotVarName(DotVarName ast, Object o) {
+    return layoutBinary("Dot.Var.Name", ast.I, ast.V);
+    }
+
+    @Override
+    public Object visitSubscriptVarName(SubscriptVarName ast, Object o) {
+    return layoutBinary("Sub.Var.Name",
+        ast.V, ast.E);
     }
 
 }

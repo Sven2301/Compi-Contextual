@@ -136,5 +136,12 @@ public interface Visitor {
 
     public Object visitSimpleVarName(SimpleVarName aThis, Object o);
 
+    public Object visitVarTDDeclaration(VarTDDeclaration aThis, Object o);
+
+    public Object visitDotVarName(DotVarName aThis, Object o);
+
+    public Object visitSubscriptVarName(SubscriptVarName aThis, Object o);
+
+
 
 }

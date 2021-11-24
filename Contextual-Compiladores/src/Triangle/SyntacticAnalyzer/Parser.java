@@ -82,6 +82,7 @@ import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SimpleVarName;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -97,6 +98,7 @@ import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
+import Triangle.AbstractSyntaxTrees.VarName;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
@@ -705,7 +707,7 @@ public class Parser {
   Vname parseRestOfVname(Identifier identifierAST) throws SyntaxError {
     SourcePosition vnamePos = new SourcePosition();
     vnamePos = identifierAST.position;
-    Vname vAST = new SimpleVname(identifierAST, vnamePos);
+    VarName vAST = new SimpleVarName(identifierAST, vnamePos);
 
     while (currentToken.kind == Token.DOT || currentToken.kind == Token.LBRACKET) {
 

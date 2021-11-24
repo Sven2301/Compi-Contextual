@@ -35,6 +35,7 @@ import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DoUntilCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.DotVarName;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -91,6 +92,7 @@ import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.SubscriptVarName;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.Terminal;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
@@ -1294,6 +1296,51 @@ public final class Checker implements Visitor {
     if (ast.duplicated)
       reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
     return null;
+    }
+
+    @Override
+    public Object visitDotVarName(DotVarName ast, Object o) {
+    ast.type = null;
+
+    TypeDenoter vType;
+    if (o instanceof String)
+      vType = (TypeDenoter) ast.V.visit(this, o);
+
+    else
+      vType = (TypeDenoter) ast.V.visit(this, o);
+
+    ast.variable = ast.V.variable;
+    if (!(vType instanceof RecordTypeDenoter))
+      reporter.reportError("record expected here", "", ast.V.position);
+    else {
+      ast.type = checkFieldIdentifier(((RecordTypeDenoter) vType).FT, ast.I);
+      if (ast.type == StdEnvironment.errorType)
+        reporter.reportError("no field \"%\" in this record type", ast.I.spelling, ast.I.position);
+    }
+    return ast.type;
+    }
+
+    public Object visitSubscriptVarName(SubscriptVarName ast, Object o) {
+
+    TypeDenoter vType;
+    if (o instanceof String)
+      vType = (TypeDenoter) ast.V.visit(this, o);
+
+    else
+      vType = (TypeDenoter) ast.V.visit(this, o);
+
+    ast.variable = ast.V.variable;
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    if (vType != StdEnvironment.errorType) {
+      if (!(vType instanceof ArrayTypeDenoter))
+        reporter.reportError("array expected here", "", ast.V.position);
+      else {
+        if (!eType.equals(StdEnvironment.integerType))
+          reporter.reportError("Integer expression expected here", "", ast.E.position);
+        ast.type = ((ArrayTypeDenoter) vType).T;
+      }
+    }
+    return ast.type;
     }
 
 }

@@ -23,6 +23,7 @@ import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DoUntilCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.DotVarName;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -76,6 +77,7 @@ import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.SubscriptVarName;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
@@ -709,10 +711,11 @@ public class TableVisitor implements Visitor {
       return(null);
   }
   
+  // CAMVIO @Steven
   public Object visitSimpleVname(SimpleVname ast, Object o) { 
-      ast.I.visit(this, null);
-  
-      return(null);
+        ast.VN.visit(this, null);
+        
+        return (null);
   }
   
   public Object visitSubscriptVname(SubscriptVname ast, Object o) { 
@@ -847,7 +850,6 @@ public class TableVisitor implements Visitor {
         return (null);
     }
 
-    @Override
     public Object visitVarTDDeclaration(VarTDDeclaration ast, Object o) {
         String id = ast.I.spelling;
         
@@ -861,6 +863,22 @@ public class TableVisitor implements Visitor {
         } catch (NullPointerException e) {
         }
         ast.T.visit(this, null);
+        return (null);
+    }
+
+    @Override
+    public Object visitDotVarName(DotVarName ast, Object o) {
+        ast.I.visit(this, null);
+        ast.V.visit(this, null);
+
+        return (null);
+    }
+
+    @Override
+    public Object visitSubscriptVarName(SubscriptVarName ast, Object o) {
+        ast.E.visit(this, null);
+        ast.V.visit(this, null);
+
         return (null);
     }
 }

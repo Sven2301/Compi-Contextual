@@ -43,6 +43,7 @@ import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DoUntilCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.DotVarName;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -96,6 +97,7 @@ import Triangle.AbstractSyntaxTrees.SingleElsifCommand;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.SubscriptVarName;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
@@ -106,6 +108,7 @@ import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
 import Triangle.AbstractSyntaxTrees.VarName;
+import Triangle.AbstractSyntaxTrees.VarTDDeclaration;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
@@ -1234,6 +1237,73 @@ public final class Encoder implements Visitor {
     ast.offset = 0;
     ast.indexed = false;
     return ast.I.decl.entity;
+    }
+
+    @Override
+    public Object visitVarTDDeclaration(VarTDDeclaration aThis, Object o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object visitDotVarName(DotVarName ast, Object o) {
+    Frame frame = (Frame) o;
+    RuntimeEntity baseObject = (RuntimeEntity) ast.V.visit(this, frame);
+    ast.offset = ast.V.offset + ((Field) ast.I.decl.entity).fieldOffset;
+                   // I.decl points to the appropriate record field
+    ast.indexed = ast.V.indexed;
+    return baseObject;
+    }
+
+    @Override
+    public Object visitSubscriptVarName(SubscriptVarName ast, Object o) {
+    Frame frame = (Frame) o;
+    RuntimeEntity baseObject;
+    int elemSize, indexSize, jump1Addr, jump2Addr;
+
+    baseObject = (RuntimeEntity) ast.V.visit(this, frame);
+    int arraySize = (Integer) ast.V.visit2(this, o);
+    ast.offset = ast.V.offset;
+    ast.indexed = ast.V.indexed;
+    elemSize = ((Integer) ast.type.visit(this, null)).intValue();
+    if (ast.E instanceof IntegerExpression) {
+      IntegerLiteral IL = ((IntegerExpression) ast.E).IL;
+      // Verificación de índice con expresión entera literal
+      if(arraySize <= Integer.parseInt(IL.spelling) || Integer.parseInt(IL.spelling) < 0){
+        emit(Machine.HALTop, 9, 0, 0);
+      }
+      ast.offset = ast.offset + Integer.parseInt(IL.spelling) * elemSize;
+    } else {
+      // v-name is indexed by a proper expression, not a literal
+      if (ast.indexed)
+        frame.size = frame.size + Machine.integerSize;
+      indexSize = ((Integer) ast.E.visit(this, frame)).intValue();
+      // Verificación de índice con expresión entera
+      emit(Machine.LOADop, 1, Machine.STr, -1);
+      emit(Machine.LOADLop, 0, 0, 0);
+      emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+      jump1Addr = nextInstrAddr;
+      emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, 0);
+      emit(Machine.HALTop, 9, 0, 0);
+      patch(jump1Addr, nextInstrAddr);
+      emit(Machine.LOADop, 1, Machine.STr, -1);
+      emit(Machine.LOADLop, 0, 0, arraySize);
+      emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.ltDisplacement);
+      jump2Addr = nextInstrAddr;
+      emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, 0);
+      emit(Machine.HALTop, 9, 0, 0);
+      patch(jump2Addr, nextInstrAddr);
+      // Termina verificación de índice con expresión entera
+      if (elemSize != 1) {
+        emit(Machine.LOADLop, 0, 0, elemSize);
+        emit(Machine.CALLop, Machine.SBr, Machine.PBr,
+             Machine.multDisplacement);
+      }
+      if (ast.indexed)
+        emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.addDisplacement);
+      else
+        ast.indexed = true;
+    }
+    return baseObject;
     }
 
 
