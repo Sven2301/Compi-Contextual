@@ -68,6 +68,7 @@ import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SimpleVarName;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -84,6 +85,7 @@ import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
+import Triangle.AbstractSyntaxTrees.VarTDDeclaration;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
@@ -556,5 +558,15 @@ public class TreeVisitor implements Visitor {
     @Override
     public Object visitSingleElsifCommand(SingleElsifCommand ast, Object o) {
         return(createBinary("Or Command", ast.E, ast.C));
+    }
+
+    @Override
+    public Object visitSimpleVarName(SimpleVarName ast, Object o) {
+        return(createUnary("Simple Var Name", ast.I));   
+    }
+
+    @Override
+    public Object visitVarTDDeclaration(VarTDDeclaration ast, Object o) {
+        return(createBinary("Variable Typed-denoted Declaration", ast.I, ast.T));
     }
 }

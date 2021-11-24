@@ -80,6 +80,7 @@ import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SimpleVarName;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -96,6 +97,7 @@ import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
+import Triangle.AbstractSyntaxTrees.VarTDDeclaration;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
@@ -674,5 +676,15 @@ public class LayoutVisitor implements Visitor {
     public Object visitSingleElsifCommand(SingleElsifCommand ast, Object o) {
       return layoutBinary("Sing.Or.Com", ast.E, ast.C);
   }
+
+    @Override
+    public Object visitSimpleVarName(SimpleVarName ast, Object o) {
+    return layoutUnary("Sim.Var.Name", ast.I);
+    }
+
+    @Override
+    public Object visitVarTDDeclaration(VarTDDeclaration ast, Object o) {
+            return layoutBinary("VarDecl.", ast.I, ast.T);
+    }
 
 }

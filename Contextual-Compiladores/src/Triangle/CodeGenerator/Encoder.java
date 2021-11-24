@@ -88,6 +88,7 @@ import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SimpleVarName;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -104,6 +105,7 @@ import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
+import Triangle.AbstractSyntaxTrees.VarName;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
@@ -697,9 +699,7 @@ public final class Encoder implements Visitor {
   }
 
   public Object visitSimpleVname(SimpleVname ast, Object o) {
-    ast.offset = 0;
-    ast.indexed = false;
-    return ast.I.decl.entity;
+    return ast.VN.visit(this, o);
   }
 
   public Object visitSubscriptVname(SubscriptVname ast, Object o) {
@@ -1016,11 +1016,26 @@ public final class Encoder implements Visitor {
     }
   }
 
-  /* Métodos visitantes para las nuevas estructuras sintácticas, se implementarán en el proyecto 2 (Austin) */
   @Override
+  // IMPLEMENTADO @Steven
   public Object visitVarInitializedDeclaration(VarInitializedDeclaration ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    Frame frame = (Frame) o;
+    int extraSize;
+    extraSize = ((Integer)ast.T.visit(this, null));
+    emit(Machine.PUSHop, 0, 0, extraSize);
+    ast.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
+    
+   
+    Integer valSize = (Integer) ast.E.visit(this, frame);
+    Identifier id = new Identifier(ast.I.spelling,ast.position);
+    id.decl = ast;
+    
+    VarName varn = new SimpleVarName(id,ast.position);
+
+    SimpleVname vn = new SimpleVname(varn,ast.position);
+    encodeStore(vn, new Frame (frame, valSize), valSize);
+    writeTableDetails(ast);  
+    return extraSize;
   }
 
   @Override
@@ -1079,8 +1094,10 @@ public final class Encoder implements Visitor {
 
   @Override
   public Object visitRangeVarDecl(RangeVarDecl ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+      Frame frame = (Frame) o;
+      int idSize = ((Integer) ast.E.visit(this, frame)).intValue();
+      ast.D.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
+      return idSize;
   }
 
   @Override
@@ -1090,23 +1107,41 @@ public final class Encoder implements Visitor {
   }
 
     @Override
-    public Object visitRecDeclaration(RecDeclaration aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // IMPLEMENTADO @Steven
+    public Object visitRecDeclaration(RecDeclaration ast, Object o) {
+        return ast.PFs.visit(this, o);
     }
 
     @Override
-    public Object visitSequentialProcFuncs(SequentialProcFuncs aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // IMPLENTADO @Steven
+    public Object visitSequentialProcFuncs(SequentialProcFuncs ast, Object o) {
+      int extraSize = 0;
+      
+      extraSize += (Integer) ast.PF1.visit(this, o);
+      extraSize += (Integer) ast.PF2.visit(this, o);
+      return extraSize;
     }
 
     @Override
-    public Object visitProcedure(Procedure aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // IMPLEMENTADO @Steven
+    public Object visitProcedure(Procedure ast, Object o) {
+      int extraSize = 0;
+      extraSize += (Integer) ast.FPS.visit(this, o);
+      ast.C.visit(this, o);
+      return extraSize;    
     }
 
     @Override
-    public Object visitFunction(Function aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // IMPLEMENTADO @Steven
+    public Object visitFunction(Function ast, Object o) {
+      int extraSize = 0;
+      
+      extraSize += (Integer) ast.FPS.visit(this,o);
+      
+      if(ast.E.type != null){
+          extraSize += (Integer) ast.E.visit(this, o);
+      }
+      return extraSize;   
     }
 
     @Override
@@ -1192,6 +1227,14 @@ public final class Encoder implements Visitor {
     
     return jumpAddr;
   }
+
+    @Override
+    //IMPLEMENTADO @Steven
+    public Object visitSimpleVarName(SimpleVarName ast, Object o) {
+    ast.offset = 0;
+    ast.indexed = false;
+    return ast.I.decl.entity;
+    }
 
 
 }

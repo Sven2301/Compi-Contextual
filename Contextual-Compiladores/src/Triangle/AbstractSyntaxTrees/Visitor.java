@@ -134,5 +134,7 @@ public interface Visitor {
 
     public Object visitSingleElsifCommand(SingleElsifCommand aThis, Object o);
 
+    public Object visitSimpleVarName(SimpleVarName aThis, Object o);
+
 
 }

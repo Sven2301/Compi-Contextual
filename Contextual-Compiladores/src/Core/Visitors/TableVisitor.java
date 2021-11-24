@@ -68,6 +68,7 @@ import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SimpleVarName;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -84,6 +85,7 @@ import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
+import Triangle.AbstractSyntaxTrees.VarTDDeclaration;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
@@ -834,6 +836,31 @@ public class TableVisitor implements Visitor {
         ast.E.visit(this, null);
         ast.C.visit(this, null);
         
+        return (null);
+    }
+
+    @Override
+    // AGREGADO @Steven
+    public Object visitSimpleVarName(SimpleVarName ast, Object o) {
+        ast.I.visit(this, null);
+
+        return (null);
+    }
+
+    @Override
+    public Object visitVarTDDeclaration(VarTDDeclaration ast, Object o) {
+        String id = ast.I.spelling;
+        
+        try {
+        addIdentifier(id,
+                "KnownAddress",
+                (ast.entity != null ? ast.entity.size : 0),
+                ((KnownAddress) ast.entity).address.level,
+                ((KnownAddress) ast.entity).address.displacement,
+                -1);
+        } catch (NullPointerException e) {
+        }
+        ast.T.visit(this, null);
         return (null);
     }
 }

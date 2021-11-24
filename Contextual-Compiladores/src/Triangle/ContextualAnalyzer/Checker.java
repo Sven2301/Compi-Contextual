@@ -83,6 +83,7 @@ import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialElsifCommand;
 import Triangle.AbstractSyntaxTrees.SequentialProcFuncs;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
+import Triangle.AbstractSyntaxTrees.SimpleVarName;
 import Triangle.AbstractSyntaxTrees.SimpleVname;
 import Triangle.AbstractSyntaxTrees.SingleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
@@ -101,6 +102,7 @@ import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
+import Triangle.AbstractSyntaxTrees.VarTDDeclaration;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
@@ -713,10 +715,13 @@ public final class Checker implements Visitor {
     return ast.type;
   }
 
+  // CAMBIO @Steven
   public Object visitSimpleVname(SimpleVname ast, Object o) {
-      
+    TypeDenoter vnType = (TypeDenoter) ast.VN.visit(this, null);
+    ast.variable = ast.VN.variable;
+    return vnType;
     
-    
+    /*
     ast.variable = false;
     ast.type = StdEnvironment.errorType;
     Declaration binding = (Declaration) ast.I.visit(this, null);
@@ -749,6 +754,7 @@ public final class Checker implements Visitor {
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
     return ast.type;
+      ELIMINADO @Steven*/
   }
 
   public Object visitSubscriptVname(SubscriptVname ast, Object o) {
@@ -1245,5 +1251,49 @@ public final class Checker implements Visitor {
     ast.C.visit(this, null);
     return null;
   }
+
+    @Override
+    // IMPLEMENTADO @Steven
+    public Object visitSimpleVarName(SimpleVarName ast, Object o) {
+    ast.variable = false;
+    ast.type = StdEnvironment.errorType;
+    Declaration binding;
+    if (o instanceof String) {
+      binding = (Declaration) ast.I.visit(this, o);
+    } else
+      binding = (Declaration) ast.I.visit(this, null);
+
+    if (binding == null)
+      reportUndeclared(ast.I);
+    else if (binding instanceof ConstDeclaration) {
+      ast.type = ((ConstDeclaration) binding).E.type;
+      ast.variable = false;
+    } else if (binding instanceof VarTDDeclaration) {
+
+      ast.type = ((VarTDDeclaration) binding).T;
+      VarTDDeclaration var = (VarTDDeclaration) binding;
+      ast.variable = true;
+    } else if (binding instanceof VarInitializedDeclaration) {
+      ast.type = ((VarInitializedDeclaration) binding).T;
+      ast.variable = true;
+    } else if (binding instanceof ConstFormalParameter) {
+      ast.type = ((ConstFormalParameter) binding).T;
+      ast.variable = false;
+    } else if (binding instanceof VarFormalParameter) {
+      ast.type = ((VarFormalParameter) binding).T;
+      ast.variable = true;
+    } else
+      reporter.reportError("\"%\" is not a const or var identifier", ast.I.spelling, ast.I.position);
+    return ast.type;
+    }
+
+    // IMPLEMENTADO @Steven
+    public Object visitVarTDDeclaration(VarTDDeclaration ast, Object o) {
+    ast.T = (TypeDenoter) ast.T.visit(this, null);
+    idTable.enter(ast.I.spelling, ast);
+    if (ast.duplicated)
+      reporter.reportError("identifier \"%\" already declared", ast.I.spelling, ast.position);
+    return null;
+    }
 
 }
