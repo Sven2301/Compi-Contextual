@@ -34,6 +34,7 @@ import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DoUntilCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.DotVarName;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -89,6 +90,7 @@ import Triangle.AbstractSyntaxTrees.SingleArrayAggregate;
 import Triangle.AbstractSyntaxTrees.SingleFieldTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
+import Triangle.AbstractSyntaxTrees.SubscriptVarName;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
 import Triangle.AbstractSyntaxTrees.TypeDenoter;
@@ -306,11 +308,12 @@ public class Parser {
 
         } else {
 
-          Vname vAST = parseRestOfVname(iAST);
-          accept(Token.BECOMES);
-          Expression eAST = parseExpression();
-          finish(commandPos);
-          commandAST = new AssignCommand(vAST, eAST, commandPos);
+            VarName varnAST = parseRestOfVarName(iAST);
+            SimpleVname vnameAST = new SimpleVname (varnAST, varnAST.position);
+            accept(Token.BECOMES);
+            Expression eAST = parseExpression();
+            finish(commandPos);
+            commandAST = new AssignCommand(vnameAST, eAST, commandPos); 
         }
       }
         break;
@@ -612,9 +615,10 @@ public class Parser {
           expressionAST = new CallExpression(iAST, apsAST, expressionPos);
 
         } else {
-          Vname vAST = parseRestOfVname(iAST);
-          finish(expressionPos);
-          expressionAST = new VnameExpression(vAST, expressionPos);
+            VarName varnAST = parseRestOfVarName(iAST);
+            finish(expressionPos);
+            SimpleVname svnAST = new SimpleVname (varnAST, expressionPos);
+            expressionAST = new VnameExpression(svnAST, expressionPos); 
         }
       }
         break;
@@ -697,13 +701,47 @@ public class Parser {
   //
   ///////////////////////////////////////////////////////////////////////////////
 
-  Vname parseVname() throws SyntaxError {
-    Vname vnameAST = null; // in case there's a syntactic error
+    VarName parseVarName() throws SyntaxError {
+    VarName varNameAST = null; // in case there's a syntactic error
     Identifier iAST = parseIdentifier();
-    vnameAST = parseRestOfVname(iAST);
-    return vnameAST;
+    varNameAST = parseRestOfVarName(iAST);
+    return varNameAST;
   }
+  
+    VarName parseRestOfVarName(Identifier identifierAST) throws SyntaxError {
+    SourcePosition varNamePos = new SourcePosition();
+    varNamePos = identifierAST.position;
+    VarName vAST = new SimpleVarName(identifierAST, varNamePos);
 
+    while (currentToken.kind == Token.DOT ||
+           currentToken.kind == Token.LBRACKET) {
+
+      if (currentToken.kind == Token.DOT) {
+        acceptIt();
+        Identifier iAST = parseIdentifier();
+        vAST = new DotVarName(vAST, iAST, varNamePos);
+      } else {
+        acceptIt();
+        Expression eAST = parseExpression();
+        accept(Token.RBRACKET);
+        finish(varNamePos);
+        vAST = new SubscriptVarName(vAST, eAST, varNamePos);
+      }
+    }
+    return vAST;
+  }
+  
+
+  Vname parseVname() throws SyntaxError {
+      Vname vnameAST = null;
+      SourcePosition vnamePos = new SourcePosition();
+      Identifier iAST = parseIdentifier();
+      VarName vnAST = parseRestOfVarName(iAST);
+      finish(vnamePos);
+      vnameAST = new SimpleVname(vnAST, vnamePos);
+      return vnameAST;
+  }
+  /* ELIMINADO @Steven
   Vname parseRestOfVname(Identifier identifierAST) throws SyntaxError {
     SourcePosition vnamePos = new SourcePosition();
     vnamePos = identifierAST.position;
@@ -725,6 +763,7 @@ public class Parser {
     }
     return vAST;
   }
+  */
 
   ///////////////////////////////////////////////////////////////////////////////
   //
