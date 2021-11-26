@@ -1040,55 +1040,126 @@ public final class Encoder implements Visitor {
     writeTableDetails(ast);  
     return extraSize;
   }
-
+  
+  // Cambio @Marco
   @Override
   public Object visitRepeatUntilCommand(UntilCommand ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
-  }
+    Frame frame = (Frame) o;
+    int jumpAddr, loopAddr;
 
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C.visit(this, frame);
+    patch(jumpAddr, nextInstrAddr);
+    ast.E.visit(this, frame);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    return null;
+    
+  }
+  // Cambio @Marco
   @Override
   public Object visitRepeatDoWhileCommand(DoWhileCommand ast, Object o) {
-    // TODO Auto-generated method stub
+    Frame frame = (Frame) o;
+    int whileAddr;
+    whileAddr = nextInstrAddr;
+    ast.C.visit(this, frame);
+    ast.E.visit(this, frame);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, whileAddr);
     return null;
+    
   }
-
+  // Cambio @Marco
   @Override
   public Object visitRepeatDoUntilCommand(DoUntilCommand ast, Object o) {
-    // TODO Auto-generated method stub
+    Frame frame = (Frame) o;
+    int untilAddr;
+    untilAddr = nextInstrAddr;
+    ast.C.visit(this, frame);
+    ast.E.visit(this, frame);
+    emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, untilAddr);
     return null;
   }
-
+  // Cambio @Marco
   @Override
   public Object visitRepeatForRange(RepeatForRange ast, Object o) {
-    // TODO Auto-generated method stub
+     Frame frame = (Frame) o;
+    int loopAddr, jumpAddr;
+    int supSize = ((Integer) ast.E.visit(this, frame)).intValue();
+    Frame frame1 = new Frame(frame, supSize);
+    int idSize = ((Integer) ast.RVD.visit(this, frame1)).intValue();
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C.visit(this, new Frame(frame, supSize + idSize));
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.succDisplacement);
+    patch(jumpAddr,nextInstrAddr);
+    emit(Machine.LOADop, supSize + idSize, Machine.LBr, frame.size);
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    emit(Machine.POPop, 0, 0, supSize + idSize);
     return null;
   }
-
+  // Cambio @Marco
   @Override
   public Object visitRepeatForRangeWhile(RepeatForRangeWhile ast, Object o) {
-    // TODO Auto-generated method stub
+    Frame frame = (Frame) o;
+    int loopAddr, jumpAddr;
+    int supSize = ((Integer) ast.E1.visit(this, frame)).intValue();
+    Frame frame1 = new Frame(frame, supSize);
+    int idSize = ((Integer) ast.RVD.E.visit(this, frame1)).intValue();
+    ast.RVD.D.entity = new KnownAddress(Machine.addressSize, frame1.level, frame1.size);
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C.visit(this, new Frame(frame, supSize + idSize));
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.succDisplacement);
+    patch(jumpAddr,nextInstrAddr);
+    emit(Machine.LOADop, supSize + idSize, Machine.LBr, frame.size);
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+    ((Integer) ast.E2.visit(this, frame)).intValue();
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.andDisplacement); 
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    emit(Machine.POPop, 0, 0, supSize + idSize);
     return null;
   }
-
+  // Cambio @Marco
   @Override
   public Object visitRepeatForRangeUntil(RepeatForRangeUntil ast, Object o) {
-    // TODO Auto-generated method stub
+    Frame frame = (Frame) o;
+    int loopAddr, jumpAddr;
+    int supSize = ((Integer) ast.E1.visit(this, frame)).intValue();
+    Frame frame1 = new Frame(frame, supSize);
+    int idSize = ((Integer) ast.RVD.E.visit(this, frame1)).intValue();
+    ast.RVD.D.entity = new KnownAddress(Machine.addressSize, frame1.level, frame1.size);
+    jumpAddr = nextInstrAddr;
+    emit(Machine.JUMPop, 0, Machine.CBr, 0);
+    loopAddr = nextInstrAddr;
+    ast.C.visit(this, new Frame(frame, supSize + idSize));
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.succDisplacement);
+    patch(jumpAddr,nextInstrAddr);
+    emit(Machine.LOADop, supSize + idSize, Machine.LBr, frame.size);
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.geDisplacement);
+    ((Integer) ast.E2.visit(this, frame)).intValue();
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.notDisplacement); 
+    emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.andDisplacement); 
+    emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+    emit(Machine.POPop, 0, 0, supSize + idSize);
     return null;
   }
-
+  // Cambio @Marco
   @Override
   public Object visitRepeatIn(RepeatIn ast, Object o) {
     // TODO Auto-generated method stub
     return null;
   }
-
+  
   @Override
   public Object visitRecursiveProcFuncsDeclaration(RecursiveProcFuncsDeclaration ast, Object o) {
     // TODO Auto-generated method stub
     return null;
   }
-
+  // Cambio @Marco
   @Override
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
     // TODO Auto-generated method stub
@@ -1261,7 +1332,7 @@ public final class Encoder implements Visitor {
     int elemSize, indexSize, jump1Addr, jump2Addr;
 
     baseObject = (RuntimeEntity) ast.V.visit(this, frame);
-    int arraySize = (Integer) ast.V.visit2(this, o);
+    int arraySize = (Integer) ast.V.visit(this, o);
     ast.offset = ast.V.offset;
     ast.indexed = ast.V.indexed;
     elemSize = ((Integer) ast.type.visit(this, null)).intValue();
