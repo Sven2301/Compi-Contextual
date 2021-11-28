@@ -598,38 +598,33 @@ public class LayoutVisitor implements Visitor {
 
   @Override
   public Object visitRepeatForRange(RepeatForRange ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutTernary ("RepeatForRange.", ast.C, ast.E,ast.RVD);
   }
 
   @Override
   public Object visitRepeatForRangeWhile(RepeatForRangeWhile ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutQuaternary("RepeatForRangeWhile.", ast.C, ast.E1,ast.E2,ast.RVD);
+    
   }
 
   @Override
   public Object visitRepeatForRangeUntil(RepeatForRangeUntil ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutQuaternary("RepeatForRangeUntil.", ast.C, ast.E1,ast.E2,ast.RVD);
   }
 
   @Override
   public Object visitRepeatIn(RepeatIn ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutBinary("RepeatIn.", ast.C, ast.IVD);
   }
 
   @Override
   public Object visitRecursiveProcFuncsDeclaration(RecursiveProcFuncsDeclaration ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutUnary("RecursiveProcFuncsDeclaration.", ast.PFD);
   }
 
   @Override
   public Object visitLocalDeclaration(LocalDeclaration ast, Object o) {
-    // TODO Auto-generated method stub
-    return null;
+    return layoutBinary("Declaration.", ast.D1,ast.D2);
   }
 
     @Override

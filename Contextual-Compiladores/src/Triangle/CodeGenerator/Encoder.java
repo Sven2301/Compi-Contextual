@@ -1108,6 +1108,7 @@ public final class Encoder implements Visitor {
     int supSize = ((Integer) ast.E1.visit(this, frame)).intValue();
     Frame frame1 = new Frame(frame, supSize);
     int idSize = ((Integer) ast.RVD.E.visit(this, frame1)).intValue();
+    System.out.println(ast.RVD.D.entity);
     ast.RVD.D.entity = new KnownAddress(Machine.addressSize, frame1.level, frame1.size);
     jumpAddr = nextInstrAddr;
     emit(Machine.JUMPop, 0, Machine.CBr, 0);
@@ -1170,6 +1171,7 @@ public final class Encoder implements Visitor {
   public Object visitRangeVarDecl(RangeVarDecl ast, Object o) {
       Frame frame = (Frame) o;
       int idSize = ((Integer) ast.E.visit(this, frame)).intValue();
+      System.out.println(ast.D);
       ast.D.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
       return idSize;
   }

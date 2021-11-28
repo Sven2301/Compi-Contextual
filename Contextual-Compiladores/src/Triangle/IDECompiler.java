@@ -11,11 +11,10 @@ import Triangle.SyntacticAnalyzer.SourceFile;
 import Triangle.SyntacticAnalyzer.TokenWriter;
 import Triangle.SyntacticAnalyzer.Scanner;
 import Triangle.AbstractSyntaxTrees.Program;
+import Triangle.CodeGenerator.Encoder;
 import Triangle.ContextualAnalyzer.Checker;
 import Triangle.SyntacticAnalyzer.Parser;
 import Triangle.TreeWriterHTML.Writer;
-// import Triangle.ContextualAnalyzer.Checker;
-// import Triangle.CodeGenerator.Encoder;
 
 
 
@@ -59,7 +58,10 @@ public class IDECompiler {
         TokenWriter tokenWriter = new TokenWriter(sourceName, scannerForPrinting);
         rootAST = parser.parseProgram();
         // Se escribe el código fuente en un archivo HTML (Austin)
+        
+        
         tokenWriter.writeTokens();
+        
         if (report.numErrors == 0) {
             // Si no hay errores sintácticos se crea el XML de los AST
             Writer xmlWriter = new Writer(sourceName);
@@ -69,12 +71,13 @@ public class IDECompiler {
             Checker checker = new Checker(report);
             checker.check(rootAST);
             if (report.numErrors == 0) {
-                //System.out.println("Code Generation ...");
-                //Encoder encoder = new Encoder(report);
-                //encoder.encodeRun(rootAST, false);
+                System.out.println("Code Generation ...");
+                //Cambio @Marco
+                Encoder encoder = new Encoder(report);
+                encoder.encodeRun(rootAST, false);
                 
                 if (report.numErrors == 0) {
-                    //encoder.saveObjectProgram(sourceName.replace(".tri", ".tam"));
+                    encoder.saveObjectProgram(sourceName.replace(".tri", ".tam"));
                     success = true;
                 }
             }

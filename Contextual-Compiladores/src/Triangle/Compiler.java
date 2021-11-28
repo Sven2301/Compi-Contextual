@@ -83,7 +83,7 @@ public class Compiler {
         drawer   = new Drawer();
         tokenWriter = new TokenWriter(sourceName, scanner);
 
-        // scanner.enableDebugging();
+        scanner.enableDebugging();
         theAST = parser.parseProgram();				// 1st pass
         tokenWriter.writeTokens();
         if (reporter.numErrors == 0) {
@@ -95,15 +95,15 @@ public class Compiler {
              if (showingAST) {
                  drawer.draw(theAST);
              }
-            // if (reporter.numErrors == 0) {
-                // System.out.println("Code Generation ...");
-                // encoder.encodeRun(theAST, showingTable);	// 3rd pass
-            // }
+            if (reporter.numErrors == 0) {
+                System.out.println("Code Generation ...");
+                encoder.encodeRun(theAST, showingTable);	// 3rd pass
+             }
         }
 
 	boolean successful = (reporter.numErrors == 0);
         if (successful) {
-            // encoder.saveObjectProgram(objectName);
+            encoder.saveObjectProgram(objectName);
             System.out.println("Compilation was successful.");
         } else {
             System.out.println("Compilation was unsuccessful.");

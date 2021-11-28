@@ -42,9 +42,10 @@ public class Interpreter {
 
   // status values
   final static int
+          //Cambio @Marco
     running = 0, halted = 1, failedDataStoreFull = 2, failedInvalidCodeAddress = 3,
     failedInvalidInstruction = 4, failedOverflow = 5, failedZeroDivide = 6,
-    failedIOError = 7;
+    failedIOError = 7, indexError = 8;
 
   static long
     accumulator;
@@ -205,6 +206,9 @@ public class Interpreter {
         break;
       case failedIOError:
         System.out.println("Program has failed due to an IO error.");
+        break;
+      case indexError:
+        System.out.println("Index error");
         break;
     }
     if (status != halted)
@@ -567,8 +571,14 @@ public class Interpreter {
           else
             CP = CP + 1;
           break;
+        /*
         case Machine.HALTop:
           status = halted;
+          break;
+        */
+        case Machine.HALTop:
+          if (n == 8) status = indexError;
+          else status = halted;
           break;
       }
       if ((CP < CB) || (CP >= CT))
