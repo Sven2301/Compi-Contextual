@@ -424,19 +424,11 @@ public class TableVisitor implements Visitor {
     return(null);
   }
 
-  /* Para reconocer una declaración de variable en un ciclo for range (Austin) */
+  // CAMBIO @Steven
   public Object visitRangeVarDecl(RangeVarDecl ast, Object o) {      
-    try {
-    addIdentifier(ast.I.spelling, 
-            "KnownAddress", 
-            (ast.entity!=null?ast.entity.size:0), 
-            ((KnownAddress)ast.entity).address.level, 
-            ((KnownAddress)ast.entity).address.displacement, 
-            -1);
-    } catch (NullPointerException e) { }
-    
-    ast.E.visit(this, null);
-    return(null);
+        ast.I.visit(this, null);
+        ast.E.visit(this, null);
+        return (null);
   }
 
   /* Para reconocer una declaración de variable en un ciclo for range in (Austin) */

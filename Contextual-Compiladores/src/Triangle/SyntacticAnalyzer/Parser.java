@@ -101,6 +101,7 @@ import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.VarInitializedDeclaration;
 import Triangle.AbstractSyntaxTrees.VarName;
+import Triangle.AbstractSyntaxTrees.VarTDDeclaration;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
@@ -890,7 +891,7 @@ public class Parser {
         } else if (currentToken.kind == Token.COLON) {
           acceptIt();
           TypeDenoter tAST = parseTypeDenoter();
-          declarationAST = new VarDeclaration(iAST, tAST, declarationPos);
+          declarationAST = new VarTDDeclaration(iAST, tAST, declarationPos);
         } 
         finish(declarationPos);
       }
