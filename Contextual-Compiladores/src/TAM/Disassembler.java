@@ -321,9 +321,11 @@ public class Disassembler {
         writeD(instr.d);
         writeR('[', instr.r, ']');
         break;
-
+      //Cambio Marco
       case Machine.HALTop:
         System.out.print ("HALT  ");
+        writeN(instr.n);
+        break;
     }
   }
 

@@ -288,6 +288,21 @@ public class Parser {
     }
     return commandAST;
   }
+  
+  RangeVarDecl parseRangeVarDecl() throws SyntaxError {
+    RangeVarDecl rvdAST = null; // in case there's a syntactic error
+
+    SourcePosition ffcPos = new SourcePosition();
+    start(ffcPos);
+    accept(Token.FOR);
+    Identifier iAST = parseIdentifier();
+    accept(Token.BECOMES);
+    accept(Token.RANGE);
+    Expression eAST = parseExpression();
+    finish(ffcPos);
+    rvdAST = new RangeVarDecl (iAST,eAST, ffcPos);
+    return rvdAST;
+  }
 
   Command parseSingleCommand() throws SyntaxError {
     Command commandAST = null; // in case there's a syntactic error
@@ -348,16 +363,21 @@ public class Parser {
       case Token.REPEAT: {
         acceptIt();
         switch (currentToken.kind) {
+            
           case Token.FOR: {
-            acceptIt();
-            Identifier iAST = parseIdentifier();
-            if (currentToken.kind == Token.BECOMES) {
-              acceptIt();
-              accept(Token.RANGE);
-              Expression eAST1 = parseExpression();
-              RangeVarDecl rvdAST = new RangeVarDecl(iAST, eAST1, previousTokenPosition);
+            
+            //acceptIt();
+            //Identifier iAST = parseIdentifier();
+            
+              //acceptIt();
+              //accept(Token.RANGE);
+              //Expression eAST1 = parseExpression();
+              RangeVarDecl rvdAST = parseRangeVarDecl();
+              //RangeVarDecl rvdAST = new RangeVarDecl(iAST, eAST1, previousTokenPosition);
               accept(Token.DOUBLEDOT);
+              
               Expression eAST2 = parseExpression();
+              
               if (currentToken.kind == Token.WHILE) {
                 acceptIt();
                 Expression eAST3 = parseExpression();
@@ -379,11 +399,12 @@ public class Parser {
                 Command cAST = parseCommand();
                 accept(Token.END);
                 finish(commandPos);
-                commandAST = new RepeatForRange(rvdAST, eAST1, cAST, commandPos);
+                commandAST = new RepeatForRange(rvdAST, eAST2, cAST, commandPos);
               } else {
                 syntacticError("\"%\" cannot start a Repeat-For-Range command", currentToken.spelling);
               }
-            } else if (currentToken.kind == Token.IN) {
+              /*
+            else if (currentToken.kind == Token.IN) {
               acceptIt();
               Expression eAST3 = parseExpression();
               InVarDecl ivdAST = new InVarDecl(iAST, eAST3, commandPos);
@@ -395,6 +416,7 @@ public class Parser {
             } else {
               syntacticError("\"%\" cannot start a Repeat-In command", currentToken.spelling);
             }
+              */
             break;
           }
           case Token.WHILE: {

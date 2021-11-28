@@ -759,45 +759,85 @@ public class WriterVisitor implements Visitor {
 
     @Override
     public Object visitFuncDeclaration2(FuncDeclaration ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<FuncDeclaration>");
+        ast.E.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.T.visit(this, null);
+        ast.I.visit(this, null);
+        writeLineHTML("</FuncDeclaration>");
+        return null;
     }
 
     @Override
     public Object visitProcDeclaration2(ProcDeclaration ast, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<ProcDeclaration>");
+        ast.C.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.I.visit(this, null);
+        writeLineHTML("</ProcDeclaration>");
+        return null;
     }
 
     @Override
     public Object visitCompoundIfCommand(CompoundIfCommand aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<CompoundIfCommand>");
+        aThis.C1.visit(this, null);
+        aThis.C2.visit(this, null);
+        aThis.E.visit(this, null);
+        aThis.EIC.visit(this, null);
+        writeLineHTML("</CompoundIfCommand>");
+        return null;
     }
 
     @Override
     public Object visitSequentialElsifCommand(SequentialElsifCommand aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<SequentialElsifCommand>");
+        aThis.SE1.visit(this, null);
+        aThis.SE2.visit(this, null);
+        writeLineHTML("</SequentialElsifCommand>");
+        return null;
     }
 
     @Override
     public Object visitSingleElsifCommand(SingleElsifCommand aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<SingleElsifCommand>");
+        aThis.C.visit(this, null);
+        aThis.E.visit(this, null);
+        writeLineHTML("</SingleElsifCommand>");
+        return null;
     }
 
     @Override
     public Object visitSimpleVarName(SimpleVarName aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<SimpleVarName>");
+        aThis.I.visit(this, null);
+        writeLineHTML("</SimpleVarName>");
+        return null;
     }
 
     public Object visitVarTDDeclaration(VarTDDeclaration aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<VarTDDeclaration>");
+        aThis.I.visit(this, null);
+        aThis.T.visit(this, null);
+        writeLineHTML("</VarTDDeclaration>");
+        return null;
     }
 
     @Override
     public Object visitDotVarName(DotVarName aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<DotVarName>");
+        aThis.V.visit(this, null);
+        aThis.I.visit(this, null);
+        writeLineHTML("</DotVarName>");
+        return null;
     }
 
     @Override
     public Object visitSubscriptVarName(SubscriptVarName aThis, Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        writeLineHTML("<SubscriptVarName>");
+        aThis.V.visit(this, null);
+        aThis.E.visit(this, null);
+        writeLineHTML("</SubscriptVarName>");
+        return null;
     }
 }
