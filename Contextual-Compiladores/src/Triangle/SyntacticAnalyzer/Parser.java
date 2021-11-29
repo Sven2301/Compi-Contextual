@@ -290,6 +290,7 @@ public class Parser {
     return commandAST;
   }
   
+  // AGREGADO @Steven
   RangeVarDecl parseRangeVarDecl() throws SyntaxError {
     RangeVarDecl rvdAST = null; // in case there's a syntactic error
 
@@ -367,6 +368,7 @@ public class Parser {
             
           case Token.FOR: {
             
+              //* CAMBIOS @Marco
             //acceptIt();
             //Identifier iAST = parseIdentifier();
             
@@ -724,6 +726,7 @@ public class Parser {
   //
   ///////////////////////////////////////////////////////////////////////////////
 
+  // AGREGADO @Steven
     VarName parseVarName() throws SyntaxError {
     VarName varNameAST = null; // in case there's a syntactic error
     Identifier iAST = parseIdentifier();
@@ -731,6 +734,7 @@ public class Parser {
     return varNameAST;
   }
   
+    // AGREGADO @Steven
     VarName parseRestOfVarName(Identifier identifierAST) throws SyntaxError {
     SourcePosition varNamePos = new SourcePosition();
     varNamePos = identifierAST.position;
